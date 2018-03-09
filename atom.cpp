@@ -177,7 +177,7 @@ std::ostream& operator<<(std::ostream& os,atom& output){
 		return os;
 }
 std::fstream& operator<<(std::fstream& os,atom& output){
-		os<<output.x<<" "<<output.y<<" ";
+		os<<output.x<<" "<<output.y<<" ";//<<output.stresstensor[0]<<" "<<output.stresstensor[1]<<" "<<output.stresstensor[2]<<" "<<output.stresstensor[3];
 		return os;
 }
 int count(std::vector<atom> all,atom& input,double r,int size){
