@@ -45,8 +45,4 @@ int main(){
     std::cout<<"There are "<<count<<" steps"<<std::endl;
     std::cout<<"The final energy is: "<<e_end<<std::endl;
     std::fstream fs;
-    fs.open("atominfo.txt",std::fstream::out);
-    for(size_t i=0;i<N;i++){
-        fs<<atomall[i]<<std::endl;
-    }
 }
