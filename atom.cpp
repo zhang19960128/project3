@@ -60,6 +60,18 @@ double potential(atom& one,atom& two){
 		return A*pow(r-r_cut,3)+B*pow(r-r_cut,2);
 	}
 }
+double allpotential(std::vector<atom>& allatom){
+    int size=allatom.size();
+    double sum=0.0;
+    double temp=0.0;
+    for(size_t i=0;i<size;i++){
+       for(std::list<int>::iterator a=allatom[i].neighbor.begin();a!=allatom[i].neighbor.end();a++){
+        temp=potential(allatom[i],allatom[*a]);   
+        sum=sum+temp;
+       }
+    }
+    return sum/2;
+}
 //the force exerted on one by two
 std::vector<double> str_tensor(atom& one,atom& two){
     std::vector<double> a(4,0);
@@ -118,7 +130,8 @@ double atom::updateposition(double lamda){
    y=y+lamda*force[1];
    return lamda*sqrt(force[0]*force[0]+force[1]*force[1]);
 }
-void updatelist(std::vector<atom>& input,int size,double r_set){
+void updatelist(std::vector<atom>& input,double r_set){
+    int size=input.size();
         for(size_t i=0;i<size;i++){
 	    input[i].neighbor.clear();
 	   }
@@ -132,7 +145,7 @@ void updatelist(std::vector<atom>& input,int size,double r_set){
 }
 double updateallposition(std::vector<atom>& atomall,double lamda){
     double maxdis=0.0;
-    double temdis=0.0;
+    double tempdis=0.0;
     for(size_t i=0;i<atomall.size();i++){
       atomall[i].updateforce(atomall);
       tempdis=atomall[i].updateposition(lamda);
@@ -164,8 +177,7 @@ std::ostream& operator<<(std::ostream& os,atom& output){
 		return os;
 }
 std::fstream& operator<<(std::fstream& os,atom& output){
-		os<<"for atom position "<<output.x<<" "<<output.y<<std::endl;
-		os<<"stress tensor(xx,xy,yx,yy): "<<output.stresstensor[0]<<" "<<output.stresstensor[1]<<" "<<output.stresstensor[2]<<" "<<output.stresstensor[3]<<std::endl;
+		os<<output.x<<" "<<output.y<<" ";
 		return os;
 }
 int count(std::vector<atom> all,atom& input,double r,int size){
@@ -199,4 +211,7 @@ void print_radial_dis(double r_start,double r_stop,std::vector<atom> atomall,int
     }
     radis.close();
 }
-
+void atom::printforce(){
+    std::cout<<"F(x):"<<force[0]<<std::endl;
+    std::cout<<"F(y):"<<force[1]<<std::endl;
+}

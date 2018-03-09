@@ -20,26 +20,30 @@ class atom{
 		std::vector<double> getstress();
 		void printneighbor();
 		void printstress();
+        void printforce();
 		void printinfo();
-                void updateforce(std::vector<atom>& atomall);
+        void updateforce(std::vector<atom>& atomall);
 		double updateposition(double);
-                double updateallposition(std::vector<atom>& atomall,double lamda);
-                friend double distance(atom&,atom&);
+        friend double distance(atom&,atom&);
 		friend double potential(atom&,atom&);
-		friend void updatelist(std::vector<atom>&,int,double);
-                friend void updatetensor(std::vector<atom>&,int);
-                friend std::vector<double> cal_force(atom& one,atom& two);
+		friend void updatelist(std::vector<atom>&,double);
+        friend void updatetensor(std::vector<atom>&,int);
+        friend std::vector<double> cal_force(atom& one,atom& two);
+        /*updateallposition include unpdate the force in this atom*/
+        friend double updateallposition(std::vector<atom>& atomall,double lamda);
 		friend std::vector<double> str_tensor(atom&,atom&);
 		friend std::ostream& operator<<(std::ostream& os,atom& output);
 		friend std::fstream& operator<<(std::fstream& fs,atom& output);
+        friend double allpotential(std::vector<atom>& allatom);
 	private:
 		double x;
 		double y;
 		double radius;
 		std::list<int> neighbor;
-                std::vector<double> force;
-                std::vector<double> stresstensor;
+        std::vector<double> force;
+        std::vector<double> stresstensor;
 };
+
 int count(std::vector<atom> all,atom* input,double r, int size);
 void print_radial_dis(double,double,std::vector<atom>&,int,std::string);
 std::vector<double>& operator +=(std::vector<double>& one,std::vector<double>& two);
