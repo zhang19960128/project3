@@ -15,6 +15,7 @@ int main(){
     double r_verlet=1.2*r_cut;
     double r_shell_initial=r_verlet-r_cut;
     double r_shell=r_shell_initial;
+    std::vector<double> totalstress;
     for(size_t i=0;i<size;i++)
      for(size_t j=0;j<size;j++){
         temp=i*size+j;
@@ -40,9 +41,14 @@ int main(){
         }
         e_end=allpotential(atomall);
         count++;
-        std::cout<<count<<std::endl;
+       // std::cout<<count<<std::endl;
+        if(count%50==0){
+         updatetensor(atomall);
+         totalstress=totaltensor(atomall);
+         std::cout<<count<<" "<<totalstress[0]<<" "<<totalstress[1]<<" "<<totalstress[2]<<" "<<totalstress[3]<<std::endl;
+        }
     }while(fabs(e_end-e_start)>1e-10);
     std::cout<<"There are "<<count<<" steps"<<std::endl;
     std::cout<<"The final energy is: "<<e_end<<std::endl;
-    std::fstream fs;
+    print_radial_dis(0.000001,10,atomall,"radial.txt");
 }

@@ -43,6 +43,10 @@ void atom::printinfo(){
 	printneighbor();
 	printstress();
 }
+void atom::printforce(){
+    std::cout<<"F(x):"<<force[0]<<std::endl;
+    std::cout<<"F(y):"<<force[1]<<std::endl;
+}
 double distance(atom& one,atom& two){
 	double r=(one.x-two.x)*(one.x-two.x)+(one.y-two.y)*(one.y-two.y);
 	return sqrt(r);
@@ -91,6 +95,16 @@ std::vector<double> str_tensor(atom& one,atom& two){
     a[2]=deri*(one.x-two.x)*(one.y-two.y)/r;
     a[3]=deri*(one.y-two.y)*(one.y-two.y)/r;
     return a;
+}
+std::vector<double> totaltensor(std::vector<atom>& atomall){
+    std::vector<double> re(4,0);
+    for(size_t i=0;i<atomall.size();i++){
+        re+=atomall[i].stresstensor;
+    }
+    for(size_t i=0;i<4;i++){
+        re[i]=re[i]/atomall.size();
+    }
+    return re;
 }
 std::vector<double> cal_force(atom& one,atom& two){
    std::vector<double> a(2,0);
@@ -155,9 +169,10 @@ double updateallposition(std::vector<atom>& atomall,double lamda){
    }
     return maxdis;
 }
-void updatetensor(std::vector<atom>& atomall,int size){
+void updatetensor(std::vector<atom>& atomall){
     std::vector<double> temp(4,0);
     std::vector<double> all(4,0);
+    int size=atomall.size();
     for(size_t i=0;i<size;i++){
         for(size_t k=0;k<4;k++){
             all[k]=0.0;
@@ -177,11 +192,12 @@ std::ostream& operator<<(std::ostream& os,atom& output){
 		return os;
 }
 std::fstream& operator<<(std::fstream& os,atom& output){
-		os<<output.x<<" "<<output.y<<" ";//<<output.stresstensor[0]<<" "<<output.stresstensor[1]<<" "<<output.stresstensor[2]<<" "<<output.stresstensor[3];
+		os<<output.x<<" "<<output.y<<" "<<output.stresstensor[0]<<" "<<output.stresstensor[1]<<" "<<output.stresstensor[2]<<" "<<output.stresstensor[3];
 		return os;
 }
-int count(std::vector<atom> all,atom& input,double r,int size){
+int count(std::vector<atom> all,atom& input,double r){
     int c=0;
+    int size=all.size();
     for(int i=0;i<size;i++){
         if(distance(all[i],input)<r){
             c++;
@@ -189,11 +205,14 @@ int count(std::vector<atom> all,atom& input,double r,int size){
     }
     return c-1;
 }
-void print_radial_dis(double r_start,double r_stop,std::vector<atom> atomall,int size,std::string name){
+void print_radial_dis(double r_start,double r_stop,std::vector<atom>& atomall,std::string name){
 	 // double r_start=0.0000001;
   //  double r_stop=15;
-    int N=10000;
+    int N=1000;
+    int size=atomall.size();
     std::vector<double> ra_dis(N,0.0);
+    std::vector<double> ra_dis_all(N,0.0);
+    std::vector<double> rinter(N,0.0);
     double r_delta=(r_stop-r_start)/N;
     double r_inter=0.0;
     int count_old=0;
@@ -201,17 +220,24 @@ void print_radial_dis(double r_start,double r_stop,std::vector<atom> atomall,int
     int count_delta=0;
     std::fstream radis;
     radis.open(name,std::fstream::out);
+    for(size_t j=0;j<size;j++){
     for(size_t i=0;i<N;i++){
         r_inter=i*r_delta+r_start;
-        count_new=count(atomall,atomall[100],r_inter,size);
+        rinter[i]=r_inter;//record the radius.
+        count_new=count(atomall,atomall[j],r_inter);
         count_delta=count_new-count_old;
         ra_dis[i]=count_delta/2/Pi/r_inter/r_delta;
         count_old=count_new;
-        radis<<r_inter<<" "<<ra_dis[i]<<std::endl;
+       // radis<<r_inter<<" "<<ra_dis[i]<<std::endl;
+    }
+    std::cout<<j<<std::endl;
+    ra_dis_all+=ra_dis;
+    }
+    for(size_t j=0;j<size;j++){
+        ra_dis_all[j]=ra_dis_all[j]/size;
+    }
+    for(size_t i=0;i<N;i++){
+        radis<<rinter[i]<<" "<<ra_dis_all[i]<<std::endl;
     }
     radis.close();
-}
-void atom::printforce(){
-    std::cout<<"F(x):"<<force[0]<<std::endl;
-    std::cout<<"F(y):"<<force[1]<<std::endl;
 }

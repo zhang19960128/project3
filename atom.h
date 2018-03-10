@@ -27,7 +27,8 @@ class atom{
         friend double distance(atom&,atom&);
 		friend double potential(atom&,atom&);
 		friend void updatelist(std::vector<atom>&,double);
-        friend void updatetensor(std::vector<atom>&,int);
+        friend void updatetensor(std::vector<atom>&);
+        friend std::vector<double> totaltensor(std::vector<atom>& atomall);
         friend std::vector<double> cal_force(atom& one,atom& two);
         /*updateallposition include unpdate the force in this atom*/
         friend double updateallposition(std::vector<atom>& atomall,double lamda);
@@ -44,7 +45,7 @@ class atom{
         std::vector<double> stresstensor;
 };
 
-int count(std::vector<atom> all,atom* input,double r, int size);
-void print_radial_dis(double,double,std::vector<atom>&,int,std::string);
+int count(std::vector<atom> all,atom& input,double r);
+void print_radial_dis(double,double,std::vector<atom>&,std::string);
 std::vector<double>& operator +=(std::vector<double>& one,std::vector<double>& two);
 #endif
